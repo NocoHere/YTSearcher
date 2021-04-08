@@ -1,6 +1,19 @@
 # YTSearcher
 
-React, React Router, Ant Design, Firebase, YouTube API
+Фреймворк:
+`React`
+
+UI фреймворк:
+`Ant Design`
+
+БД:
+`Firebase`
+
+API:
+`YouTube API`
+
+Вертска:
+`Для компьтерных разрешений`
 
 ### Установка
 ```
