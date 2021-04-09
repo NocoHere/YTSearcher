@@ -6,7 +6,6 @@ import { HeartTwoTone, MenuOutlined, AppstoreOutlined } from '@ant-design/icons'
 import RequestModal from './modal';
 import { Link } from 'react-router-dom';
 
-
 const { Search } = Input;  
 
 function Homepage(props) {
@@ -20,64 +19,28 @@ function Homepage(props) {
     const [loader, setLoader] = useState('');
 
     useEffect(() => {
+        if (props.rid !== '' && canRun === 'true') {
+            const database = fire.database();
+            const user = fire.auth().currentUser;
+            database.ref('users/' + user.uid + `/${props.rid}`).get().then(function(snapshot) {
+                if (snapshot.exists()) {
+                    setInputValue(snapshot.val().input);
+                    const request = `https://youtube.googleapis.com/youtube/v3/search?part=snippet&maxResults=${snapshot.val().maxResult}&order=${snapshot.val().sortBy}&q=${snapshot.val().input}&type=video&key=AIzaSyAen93UpT7_3IPJS451UvvCyERjtJcEvyk`;
+                    searcher(request);
+    
+                    setGetResults(true);
+                }
+                else {
+                  console.log("No data available");
+                }
+              }).catch(function(error) {
+                console.error(error);
+            });
+            setCanRun('false');
+        }
         setLoader('block');
         setTimeout(() => {setLoader('none')}, 1000)
     }, []);
-    if (props.rid !== '' && canRun === 'true') {
-        const database = fire.database();
-        const user = fire.auth().currentUser;
-        database.ref('users/' + user.uid + `/${props.rid}`).get().then(function(snapshot) {
-            if (snapshot.exists()) {
-                setInputValue(snapshot.val().input);
-                let xhr = new XMLHttpRequest();
-                const request = `https://youtube.googleapis.com/youtube/v3/search?part=snippet&maxResults=${snapshot.val().maxResult}&order=${snapshot.val().sortBy}&q=${snapshot.val().input}&type=video&key=AIzaSyAen93UpT7_3IPJS451UvvCyERjtJcEvyk`;
-                xhr.responseType = 'json';
-                xhr.open('GET', request);
-                xhr.send();
-                xhr.onload = function() {
-                    if (xhr.status !== 200) {
-                        console.log(`Ошибка ${xhr.status}: ${xhr.statusText}`);
-                    } else {
-                        if (xhr.response.items.length > 0) {
-                            let newVideos = [];
-                            for (let i = 0; i < xhr.response.items.length; i++) { 
-                                newVideos.push(
-                                    <div key={i + 1} className={'video-card__block1'}>
-                                        <div className={'video-card__img-block1'}>
-                                            <img style={{width: '100%'}} src={xhr.response.items[i].snippet.thumbnails.medium.url} alt={i}></img>
-                                        </div>
-                                        <div className={'video-card__text-block1'}>
-                                            <p className={'video-card__title'}>{xhr.response.items[i].snippet.title}</p>
-                                            <p className={'video-card__description'}>{xhr.response.items[i].snippet.channelTitle}
-                                            <p>{(xhr.response.items[i].snippet.publishTime).split('').splice(0,10).join('')}</p>
-                                            </p>
-                                        </div>
-                                    </div>
-                                );
-                            }
-                            setVideosCount(xhr.response.items.length);
-                            setVideos(newVideos);
-                        } else {
-                            setVideosCount(0);
-                            setVideos([<span style={{fontSize: "30px",color: "red"}}>Результатов не найдено</span>]);
-                        }    
-                    }
-                };
-
-                xhr.onerror = function() {
-                    console.log("Запрос не удался");
-                };
-
-                setGetResults(true);
-            }
-            else {
-              console.log("No data available");
-            }
-          }).catch(function(error) {
-            console.error(error);
-        });
-        setCanRun('false');
-    }
 
     const openModal = () => {
         const modal = document.querySelector('.modalBg');
@@ -140,6 +103,12 @@ function Homepage(props) {
         const input = document.getElementById('input-search');
         setInputValue(input.value);
         const request = `https://youtube.googleapis.com/youtube/v3/search?part=snippet&maxResults=12&q=${input.value}&type=video&key=AIzaSyAen93UpT7_3IPJS451UvvCyERjtJcEvyk`
+        searcher(request);
+
+        setGetResults(true);
+    }
+
+    const searcher = (request) => {
         let xhr = new XMLHttpRequest();
         xhr.responseType = 'json';
         xhr.open('GET', request);
@@ -177,9 +146,8 @@ function Homepage(props) {
         xhr.onerror = function() {
             console.log("Запрос не удался");
         };
-
-        setGetResults(true);
     }
+
     return (
         <section>
             <RequestModal succes={handleChange} request={inputValue}/>
