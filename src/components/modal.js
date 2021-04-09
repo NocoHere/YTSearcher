@@ -22,18 +22,6 @@ function RequestModal(props) {
         const name = document.getElementById('name');
         const form = document.getElementById('modal');
         let sortBy = document.querySelector('.ant-select-selection-item').title;
-        switch(sortBy) {
-            case "Релевантности":
-                sortBy = "relevance";
-                break;
-            case "Просмотрам":
-                sortBy = "rating";
-                break;  
-            case "Дате":
-                sortBy = "date";
-                break;
-            default :    
-        }
         const database = fire.database();
         const user = fire.auth().currentUser;
         database.ref('users/' + user.uid).push({
