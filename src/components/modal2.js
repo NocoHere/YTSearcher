@@ -7,7 +7,7 @@ const { Title } = Typography;
 const { Option } = Select;
 
 function FavoritesModal(props) {
-    const [maxVideos2, setMaxVideos2] = useState('');
+    const [maxVideos2, setMaxVideos2] = useState('');   
 
     const onChange2 = value => {
         setMaxVideos2(value)
@@ -41,19 +41,6 @@ function FavoritesModal(props) {
         } else {
             sortBy = form.querySelector('.ant-select-selection-placeholder').textContent;
         }    
-        console.log('here',sortBy);
-        switch(sortBy) {
-            case "Релевантности":
-                sortBy = "relevance";
-                break;
-            case "Просмотрам":
-                sortBy = "rating";
-                break;  
-            case "Дате":
-                sortBy = "date";
-                break;
-            default :    
-        }
         const database = fire.database();
         const user = fire.auth().currentUser;
         database.ref('users/' + user.uid + `/${props.rkey}`).set({
@@ -90,7 +77,6 @@ function FavoritesModal(props) {
                     >
                         <Input id="name2" placeholder={props.namez}/>
                     </Form.Item>
-        
                     <Form.Item label="Сортировать по:" name="sort2">
                         <Select id="sort2" placeholder={props.sortBy}>
                             <Option value="relevance">Релевантности</Option>
