@@ -6,9 +6,6 @@ import { BrowserRouter, Link, Route, Switch } from 'react-router-dom';
 import Homepage from './components/homepage'
 import headerLogo from './img/sibdev-logo-header.svg'
 import Favorites from './components/favorites';
-// import RequestModal from './components/modal';
-
-
 
 const { Header, Content } = Layout;
 
