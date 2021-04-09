@@ -17,6 +17,7 @@ function FavoritesModal(props) {
         const modal = document.querySelector('.modal2')
         modal.style.display = 'none';
         const form = document.getElementById('modal2');
+        setMaxVideos2('');
         form.reset();
     }
 
