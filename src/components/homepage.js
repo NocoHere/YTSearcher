@@ -24,8 +24,21 @@ function Homepage(props) {
             const user = fire.auth().currentUser;
             database.ref('users/' + user.uid + `/${props.rid}`).get().then(function(snapshot) {
                 if (snapshot.exists()) {
+                    let sort = '';
+                    switch(snapshot.val().sortBy) {
+                        case "Релевантности":
+                            sort = "relevance";
+                            break;
+                        case "Просмотрам":
+                            sort = "rating";
+                            break;  
+                        case "Дате":
+                            sort = "date";
+                            break;
+                        default :    
+                    }
                     setInputValue(snapshot.val().input);
-                    const request = `https://youtube.googleapis.com/youtube/v3/search?part=snippet&maxResults=${snapshot.val().maxResult}&order=${snapshot.val().sortBy}&q=${snapshot.val().input}&type=video&key=AIzaSyAen93UpT7_3IPJS451UvvCyERjtJcEvyk`;
+                    const request = `https://youtube.googleapis.com/youtube/v3/search?part=snippet&maxResults=${snapshot.val().maxResult}&order=${sort}&q=${snapshot.val().input}&type=video&key=AIzaSyAen93UpT7_3IPJS451UvvCyERjtJcEvyk`;
                     searcher(request);
     
                     setGetResults(true);
