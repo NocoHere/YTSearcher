@@ -11,9 +11,8 @@ const { Header, Content } = Layout;
 
 function App() {
 
-  const [user, setUser] = useState(null);
-  const [request, setRequest] = useState('');
-  const [loader, setLoader] = useState('');
+  const [user, setUser] = useState('');
+  const [request, setRequest] = useState(null);
 
   function handleChange(newRequest) {
     setRequest(newRequest);
@@ -21,15 +20,12 @@ function App() {
 
   useEffect(() => {
     authListener();
-    setLoader('block');
-    setTimeout(() => {setLoader('none')}, 1000);
   }, []);
 
   const authListener = () => {
     fire.auth().onAuthStateChanged((dbUser) => {
       if (dbUser) {
-        console.log()
-        setUser(dbUser);
+        setUser(true);
       } else {
         setUser(null);
       }
@@ -41,7 +37,7 @@ function App() {
   }
   return (
       <div className="App">
-          <div style={{ display: loader }} className={'loader'}><Spin className={'loader__spinner'}/></div>
+          {user === '' ? <div className={'loader'}><Spin className={'loader__spinner'}/></div> : ''}
           { user ? 
           (<BrowserRouter>
             <Layout className="layout">
@@ -54,8 +50,8 @@ function App() {
                   <Menu.Item key="2">
                     <Link to={'/favorites'}>Избранное</Link>
                   </Menu.Item>
-                  <Menu.Item style={{ float: 'right'}} key="3">
-                    <Link onClick={logout}>Выйти</Link>
+                  <Menu.Item style={{ float: 'right'}} key="3" onClick={logout}>
+                    Выйти
                   </Menu.Item>
                 </Menu>
               </Header>
