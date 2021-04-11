@@ -6,16 +6,19 @@ import { Form, Input, Button, Typography, Select, Slider, InputNumber, Row, Col 
 const { Title } = Typography;
 const { Option } = Select;
 
+
 function RequestModal(props) {
     const [maxVideos, setMaxVideos] = useState(12);
+    const [form] = Form.useForm();
     
     const onChange = value => {
         setMaxVideos(value)
     }
 
     const closeModal = () => {
-        const modal = document.querySelector('.modalBg')
-        modal.style.display = 'none'
+        const modal = document.querySelector('.modalBg');
+        form.resetFields();
+        modal.style.display = 'none';
     }
 
     const writeUserData = () => {
@@ -41,11 +44,9 @@ function RequestModal(props) {
         <section>
             <div className={'modalBg'}>
                 <Form
+                    form={form}
                     name="basic"
                     id="modal"
-                    initialValues={{
-                        remember: true,
-                    }}
                     onFinish={writeUserData}
                     layout="vertical"
                     className={'auth-form favorites-form'}
@@ -55,7 +56,6 @@ function RequestModal(props) {
                         label="Запрос"
                     >
                         <Input value={props.request} disabled/>
-                        {console.log('')}
                     </Form.Item>
                     <Form.Item
                         label="Название*"
@@ -71,7 +71,7 @@ function RequestModal(props) {
                         <Input id="name" placeholder="Укажите название"/>
                     </Form.Item>
         
-                    <Form.Item label="Сортировать по:" name="sort">
+                    <Form.Item label="Сортировать по:">
                         <Select id="sort" defaultValue="relevance">
                             <Option value="relevance">Релевантности</Option>
                             <Option value="rating">Просмотрам</Option>
@@ -105,11 +105,10 @@ function RequestModal(props) {
                         <Button className={ 'auth-form__btn' } onClick={closeModal} style={{ float: 'left', color: '#1390e5' }} htmlType="submit">
                             Не сохранять
                         </Button>
-                        <Button className={ 'auth-form__btn' } style={{ float: 'right' }} type="primary" htmlType="submit">
+                        <Button className={ 'auth-form__btn' } onSubmit={writeUserData} style={{ float: 'right' }} type="primary" htmlType="submit">
                             Сохранить
                         </Button>
                     </Form.Item>
-                    <span className={''}></span>
                 </Form>
             </div>
         </section>
