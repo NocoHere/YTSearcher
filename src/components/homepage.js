@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import fire from '../firebase';
 import "firebase/database";
 import { Input, Spin } from 'antd';
@@ -9,17 +9,20 @@ import { Link } from 'react-router-dom';
 const { Search } = Input;  
 
 function Homepage(props) {
-    const [getResults, setGetResults] = useState(false);
-    const [videos, setVideos] = useState([]);
+    const [videos, setVideos] = useState(null);
     const [videosCount, setVideosCount] = useState(0);
     const [view, setView] = useState(1);
     const [inputValue, setInputValue] = useState('');
-    const [canRun, setCanRun] = useState('true');
     const [succes, setSucces] = useState('none');
     const [loader, setLoader] = useState('');
 
     useEffect(() => {
-        if (props.rid !== '' && canRun === 'true') {
+        setLoader('block');
+        setTimeout(() => {setLoader('none')}, 1000)
+    }, []);
+
+    useMemo(() => {
+        if (props.rid !== null) {
             const database = fire.database();
             const user = fire.auth().currentUser;
             database.ref('users/' + user.uid + `/${props.rid}`).get().then(function(snapshot) {
@@ -39,21 +42,16 @@ function Homepage(props) {
                     }
                     setInputValue(snapshot.val().input);
                     const request = `https://youtube.googleapis.com/youtube/v3/search?part=snippet&maxResults=${snapshot.val().maxResult}&order=${sort}&q=${snapshot.val().input}&type=video&key=AIzaSyAen93UpT7_3IPJS451UvvCyERjtJcEvyk`;
-                    searcher(request);
-    
-                    setGetResults(true);
+                    searcher(request);    
                 }
                 else {
-                  console.log("No data available");
+                    console.log("No data available");
                 }
-              }).catch(function(error) {
+            }).catch(function(error) {
                 console.error(error);
             });
-            setCanRun('false');
         }
-        setLoader('block');
-        setTimeout(() => {setLoader('none')}, 1000)
-    }, []);
+    }, [props.rid]);
 
     const openModal = () => {
         const modal = document.querySelector('.modalBg');
@@ -117,8 +115,6 @@ function Homepage(props) {
         setInputValue(input.value);
         const request = `https://youtube.googleapis.com/youtube/v3/search?part=snippet&maxResults=12&q=${input.value}&type=video&key=AIzaSyAen93UpT7_3IPJS451UvvCyERjtJcEvyk`
         searcher(request);
-
-        setGetResults(true);
     }
 
     const searcher = (request) => {
@@ -128,7 +124,11 @@ function Homepage(props) {
         xhr.send();
         xhr.onload = function() {
             if (xhr.status !== 200) {
-                console.log(`Ошибка ${xhr.status}: ${xhr.statusText}`);
+                if (xhr.status === 403) {
+                    setVideos([<span style={{fontSize: "30px",color: "red"}}>Достигнут суточный лимит запросов к Youtube API :(</span>]);
+                } else {
+                    console.log(`Ошибка ${xhr.status}: ${xhr.statusText}`);
+                }
             } else {
                 if (xhr.response.items.length > 0) {
                     let newVideos = [];
@@ -164,8 +164,8 @@ function Homepage(props) {
     return (
         <section>
             <RequestModal succes={handleChange} request={inputValue}/>
-            <div className={getResults ? 'on-search-block' : 'search-block'}>
-                <h1 className={getResults ? 'on-search-block__title' : 'search-block__title'}>Поиск видео</h1>
+            <div className={videos !== null ? 'on-search-block' : 'search-block'}>
+                <h1 className={videos !== null ? 'on-search-block__title' : 'search-block__title'}>Поиск видео</h1>
                 <Search
                 id={'input-search'}
                 placeholder="Что хотите посмотреть?"
@@ -173,14 +173,14 @@ function Homepage(props) {
                 size="large"
                 suffix={suffix}
                 onSearch={onSearch}
-                className={getResults ? '' : 'search-block__input'}
+                className={videos !== null ? '' : 'search-block__input'}
                 />
                 <div id="favorites-succes" className={'favorites_succes-block'} style={{display: succes}}>
                     <p className={'favorites_succes-title'}>Поиск сохранён в разделе «Избранное»‎</p>
                     <Link to={'/favorites'} className={'favorites_succes-link'}>Перейти в избранное</Link>
                 </div>
             </div>
-            {getResults ? 
+            {videos !== null ? 
                 <div className={'result-block'}>
                     <div style={{ display: loader }} className={'loader__video'}><Spin/></div>
                     <div className={'breadcrumbs'}>
