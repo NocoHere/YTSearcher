@@ -59,9 +59,6 @@ function FavoritesModal(props) {
                 <Form
                     name="basic"
                     id="modal2"
-                    initialValues={{
-                        remember: true,
-                    }}
                     onFinish={writeUserData2}
                     layout="vertical"
                     className={'auth-form favorites-form'}
@@ -69,11 +66,13 @@ function FavoritesModal(props) {
                     <Title className={'auth-form__title'}>Редактровать запрос</Title>
                     <Form.Item
                         label="Запрос"
+                        name="request"
                     >
                         <Input id="input2" placeholder={props.input}/>
                     </Form.Item>
                     <Form.Item
                         label="Название"
+                        name="title"
                     >
                         <Input id="name2" placeholder={props.namez}/>
                     </Form.Item>
@@ -109,7 +108,7 @@ function FavoritesModal(props) {
                     </Form.Item>
         
                     <Form.Item>
-                        <Button className={ 'auth-form__btn' } onClick={closeModal2} style={{ float: 'left', color: '#1390e5' }} htmlType="submit">
+                        <Button htmlType="button" className={ 'auth-form__btn' } onClick={closeModal2} style={{ float: 'left', color: '#1390e5' }} htmlType="submit">
                             Не сохранять
                         </Button>
                         <Button className={ 'auth-form__btn' } style={{ float: 'right' }} type="primary" htmlType="submit">
