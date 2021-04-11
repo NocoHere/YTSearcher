@@ -6,8 +6,6 @@ import formLogo from './img/sibdev-logo.svg'
 
 const { Title } = Typography;
 
-
-
 class Login extends React.Component {
 
   constructor(props) {
@@ -26,11 +24,19 @@ class Login extends React.Component {
     const email = document.querySelector('#email').value;
     const password = document.querySelector('#password').value;
     fire.auth().createUserWithEmailAndPassword(email, password)
-      .then((u) => {
-        console.log('Successfully Signed Up');
-      })
       .catch((err) => {
-        console.log('Error: ' + err.toString());
+        switch(err.code) {
+          case "auth/email-already-in-use":
+            err.code = "Этот email уже зарегистрирован";
+            break; 
+          case "auth/invalid-email":
+            err.code = "Некорректный email";
+            break;
+          default:
+            err.code = "Ошибка регистрации";
+            break;
+        }
+        document.getElementById('error').textContent = err.code;
       })
   }
 
@@ -38,9 +44,6 @@ class Login extends React.Component {
     const email = document.querySelector('#email').value;
     const password = document.querySelector('#password').value;
     fire.auth().signInWithEmailAndPassword(email, password)
-      .then((u) => {
-        console.log('Successfully Logged In');
-      })
       .catch((err) => {
         switch(err.code) {
           case "auth/user-not-found":
@@ -59,9 +62,6 @@ class Login extends React.Component {
     return (
       <Form
         name="basic"
-        initialValues={{
-          remember: true,
-        }}
         className={'auth-form'}
         layout="vertical"
       >
@@ -100,7 +100,6 @@ class Login extends React.Component {
           {this.state.hasAccount ? <p>Нет аккаунта? <span className={ 'auth-form__link' } onClick={this.setHasAccount}>Зарегистроваться</span></p> : <p>Есть аккаунт? <span className={ 'auth-form__link' } onClick={this.setHasAccount}>Войти</span></p>}
           <p id="error" style={{padding: '0px', color: 'red'}}></p>
         </Form.Item>
-        {this.state.hasAccount};
       </Form>
     );
   }
